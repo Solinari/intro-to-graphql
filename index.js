@@ -1,64 +1,71 @@
 'use strict';
 
-const { graphql, buildSchema } = require ('graphql');
+const { 
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLID,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLBoolean,
+} = require ('graphql');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 
+// video type
+const videoType = new GraphQLObjectType({
+  name: 'Video',
+  description: 'A video on Egghead.io',
+  fields: {
+    id: {
+      type: GraphQLID,
+      description: 'The id of the video.'
+    },  
+    title: {
+      type: GraphQLString,
+      description: 'The title of the video.',
+    },
+    duration: {
+      type: GraphQLInt,
+      description: 'The duration of the video (in seconds).',
+    },
+    watched: {
+      type: GraphQLBoolean,
+      description: 'Whether or not the viewer has watched the video.'
+    }
+  }
+});
 
+// query type
+const queryType = new GraphQLObjectType({
+  name: 'QueryType',
+  description: 'the root query type',
+  fields: {
+    video: {
+      type: videoType,
+      resolve: () => new Promise((resolve) => {
+        resolve({
+          id: 'a',
+          title: 'GraphQL',
+          duration: 180,
+          watched: false
+        });
+      })
+    }
+  }
+});
 
-const schema = buildSchema(`
-type Query {
-  video: Video
-  videos: [Video]
-}
-
-type Video {
-  id: ID,
-  title: String,
-  duration: Int,
-  watched: Boolean
-}
-
-
-type Schema {
-  query: Query
-}
-`);
-
-const videoA = {
-  id: 'a', 
-  title: 'Video A',
-  duration: 120,
-  watched: true,
-};
-const videoB = {
-  id: 'b', 
-  title: 'Video B',
-  duration: 240, 
-  watched: false,
-};
-const videos = [videoA, videoB];
-
-const resolvers = {
-  video: () => ({
-    id: () => '1',
-    title: () => 'bar',
-    duration: () => 180,
-    watched: () => true
-  }),
-  videos: () => videos
-
-
-};
+// schema
+const schema = new GraphQLSchema({
+  query: queryType
+});
 
 //begin server
 const PORT = process.env.PORT || 3000;
 const server = express();
 
-server.use('/graphql', graphqlHTTP({
+server.use('/graphql', graphqlHTTP({ // middleware config obj on mounted endpoint
     schema,
-    graphiql: true,
-    rootValue: resolvers
+    graphiql: true
   })
 );
 
@@ -66,8 +73,3 @@ server.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
 });
 //end server
-
-
-  // graphql(schema, query, resolvers)
-  // .then((result) => console.log(result))
-  // .catch((error) => console.log(error))
