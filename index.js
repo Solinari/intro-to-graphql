@@ -10,11 +10,12 @@ const {
 } = require ('graphql');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
+const { getVideoById } = require('./src/data');
 
 // video type
 const videoType = new GraphQLObjectType({
   name: 'Video',
-  description: 'A video on Egghead.io',
+  description: 'A video',
   fields: {
     id: {
       type: GraphQLID,
@@ -42,14 +43,15 @@ const queryType = new GraphQLObjectType({
   fields: {
     video: {
       type: videoType,
-      resolve: () => new Promise((resolve) => {
-        resolve({
-          id: 'a',
-          title: 'GraphQL',
-          duration: 180,
-          watched: false
-        });
-      })
+      args: {
+        id: {
+          type: GraphQLID,
+          description: 'the id of the video'
+        }
+      },
+      resolve: (_, args) => {
+        return getVideoById(args.id);
+      }
     }
   }
 });
