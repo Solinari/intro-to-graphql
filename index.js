@@ -5,6 +5,7 @@ const { graphql, buildSchema } = require ('graphql');
 const schema = buildSchema(`
 type Query {
   video: Video
+  videos: [Video]
 }
 
 type Video {
@@ -20,20 +21,35 @@ type Schema {
 }
 `);
 
+const videoA = {
+  id: 'a', 
+  title: 'Video A',
+  duration: 120,
+  watched: true,
+};
+const videoB = {
+  id: 'b', 
+  title: 'Video B',
+  duration: 240, 
+  watched: false,
+};
+const videos = [videoA, videoB];
+
 const resolvers = {
   video: () => ({
     id: () => '1',
     title: () => 'bar',
     duration: () => 180,
     watched: () => true
-  })
+  }),
+  videos: () => videos
 
 
 };
 
 const query = `
 query myFirstQuery {
-  video {
+  videos {
     id,
     title,
     duration,
