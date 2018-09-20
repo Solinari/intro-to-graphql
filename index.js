@@ -8,7 +8,8 @@ const {
   GraphQLInt,
   GraphQLBoolean,
   GraphQLNonNull,
-  GraphQLList
+  GraphQLList,
+  GraphQLInputObjectType
 } = require ('graphql');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
@@ -34,6 +35,25 @@ const videoType = new GraphQLObjectType({
     watched: {
       type: GraphQLBoolean,
       description: 'Whether or not the viewer has watched the video.'
+    }
+  }
+});
+
+// input type
+const videoInputType = new GraphQLInputObjectType({
+  name: 'VideoInput',
+  fields: {
+    title: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'The title of the video.',
+    },
+    duration: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'The duration of the video (in seconds).',
+    },
+    watched: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'Whether or not the video is watched.',
     }
   }
 });
@@ -70,21 +90,12 @@ const mutationType = new GraphQLObjectType({
     createVideo: {
       type: videoType,
       args: {
-        title: {
-          type: new GraphQLNonNull(GraphQLString),
-          description: 'The title of the video.',
+        video: {
+          type: new GraphQLNonNull(videoInputType)
         },
-        duration: {
-          type: new GraphQLNonNull(GraphQLInt),
-          description: 'The duration of the video (in seconds).',
-        },
-        watched: {
-          type: new GraphQLNonNull(GraphQLBoolean),
-          description: 'Whether or not the video is watched.',
-        }
       },
       resolve: (_, args) => {
-        return createVideo(args);
+        return createVideo(args.video);
       }
     }
   }
