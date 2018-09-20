@@ -9,11 +9,30 @@ const {
   GraphQLBoolean,
   GraphQLNonNull,
   GraphQLList,
-  GraphQLInputObjectType
+  GraphQLInputObjectType,
+  GraphQLInterfaceType
 } = require ('graphql');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 const { createVideo, getVideoById, getVideos } = require('./src/data');
+
+// interface type
+const nodeInterface = new GraphQLInterfaceType({
+  name: 'Node',
+  fields:  {
+      id: {
+          type: new GraphQLNonNull(GraphQLID)
+      }
+  },
+  resolveType: (object) => {
+      if (object.title) {
+          return videoType;
+      }
+
+      return null;
+  }
+});
+
 
 // video type
 const videoType = new GraphQLObjectType({
@@ -21,7 +40,7 @@ const videoType = new GraphQLObjectType({
   description: 'A video',
   fields: {
     id: {
-      type: GraphQLID,
+      type: new GraphQLNonNull(GraphQLID),
       description: 'The id of the video.'
     },  
     title: {
@@ -36,7 +55,8 @@ const videoType = new GraphQLObjectType({
       type: GraphQLBoolean,
       description: 'Whether or not the viewer has watched the video.'
     }
-  }
+  },
+  interfaces: [nodeInterface]
 });
 
 // input type
