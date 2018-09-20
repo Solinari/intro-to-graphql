@@ -12,7 +12,7 @@ const {
 } = require ('graphql');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
-const { getVideoById, getVideos } = require('./src/data');
+const { createVideo, getVideoById, getVideos } = require('./src/data');
 
 // video type
 const videoType = new GraphQLObjectType({
@@ -62,9 +62,38 @@ const queryType = new GraphQLObjectType({
   }
 });
 
+//mutation type
+const mutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  description: 'The root Mutation type.',
+  fields: {
+    createVideo: {
+      type: videoType,
+      args: {
+        title: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'The title of the video.',
+        },
+        duration: {
+          type: new GraphQLNonNull(GraphQLInt),
+          description: 'The duration of the video (in seconds).',
+        },
+        watched: {
+          type: new GraphQLNonNull(GraphQLBoolean),
+          description: 'Whether or not the video is watched.',
+        }
+      },
+      resolve: (_, args) => {
+        return createVideo(args);
+      }
+    }
+  }
+});
+
 // schema
 const schema = new GraphQLSchema({
-  query: queryType
+  query: queryType,
+  mutation: mutationType
 });
 
 //begin server
@@ -80,4 +109,4 @@ server.use('/graphql', graphqlHTTP({ // middleware config obj on mounted endpoin
 server.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
 });
-//end server
+//end serveroks
