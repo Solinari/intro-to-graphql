@@ -14,35 +14,32 @@ const {
 } = require ('graphql');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
-const { createVideo, getVideoById, getVideos } = require('./src/data');
+const { createVideo, getVideoById, getVideos, getObjectById } = require('./src/data');
+const { nodeDefinitions,fromGlobalId, globalIdField } = require('graphql-relay');
 
-// interface type
-const nodeInterface = new GraphQLInterfaceType({
-  name: 'Node',
-  fields:  {
-      id: {
-          type: new GraphQLNonNull(GraphQLID)
-      }
+
+
+// Nodes interface type
+const { nodeInterface, nodeField } = nodeDefinitions(
+  (globalId) => {
+    const { type, id } = fromGlobalId(globalId);
+    return getObjectById(type.toLowerCase(), id);
   },
-  resolveType: (object) => {
-      if (object.title) {
-          return videoType;
-      }
+  (object) => {
+    if (object.title) {
+      return videoType;
+    }
 
-      return null;
+    return null;
   }
-});
-
+);
 
 // video type
 const videoType = new GraphQLObjectType({
   name: 'Video',
   description: 'A video',
   fields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLID),
-      description: 'The id of the video.'
-    },  
+    id: globalIdField(),
     title: {
       type: GraphQLString,
       description: 'The title of the video.',
@@ -83,6 +80,7 @@ const queryType = new GraphQLObjectType({
   name: 'QueryType',
   description: 'the root query type',
   fields: {
+    node: nodeField,
     video: {
       type: videoType,
       args: {
