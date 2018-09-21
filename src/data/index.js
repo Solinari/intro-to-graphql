@@ -44,6 +44,7 @@ const createVideo = ({ title, duration, watched}) => {
     return video;
 }
 
+// get by id for relay node impl
 const getObjectById = (type, id) => {
     const types = {
         video: getVideoById
@@ -52,6 +53,7 @@ const getObjectById = (type, id) => {
     return types[type](id);
 }
 
+// exports
 exports.getVideoById = getVideoById;
 exports.getVideos = getVideos;
 exports.createVideo = createVideo;

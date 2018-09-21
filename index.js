@@ -107,6 +107,7 @@ const queryType = new GraphQLObjectType({
   }
 });
 
+// video mutation
 const videoMutation = mutationWithClientMutationId({
   name: 'AddVideo',
   inputFields: {
