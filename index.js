@@ -21,6 +21,7 @@ const {
   connectionArgs,
   mutationWithClientMutationId
  } = require('graphql-relay');
+ const cors = require('cors');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 const { createVideo, getVideoById, getVideos, getObjectById } = require('./src/data');
@@ -155,7 +156,7 @@ const schema = new GraphQLSchema({
 const PORT = process.env.PORT || 3000;
 const server = express();
 
-server.use('/graphql', graphqlHTTP({ // middleware config obj on mounted endpoint
+server.use('/graphql', cors(), graphqlHTTP({ // middleware config obj on mounted endpoint
     schema,
     graphiql: true
   })
