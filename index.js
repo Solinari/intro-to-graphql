@@ -165,4 +165,4 @@ server.use('/graphql', cors(), graphqlHTTP({ // middleware config obj on mounted
 server.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
 });
-//end serveroks
+//end server
