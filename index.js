@@ -153,7 +153,7 @@ const schema = new GraphQLSchema({
 });
 
 //begin server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const server = express();
 
 server.use('/graphql', cors(), graphqlHTTP({ // middleware config obj on mounted endpoint
